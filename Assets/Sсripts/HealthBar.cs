@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 public class HealthBar : MonoBehaviour
 {
+    [SerializeField] float _changeSpeed;
+
+    private IEnumerator _corutine;
     private Slider _slider;
 
     private void Start()
@@ -13,22 +16,24 @@ public class HealthBar : MonoBehaviour
         _slider = GetComponent<Slider>();
     }
 
-    public void ShowNewHealth(float newHealth)
+    public void ChangeValue(float newHealth)
     {
-        StartCoroutine(ChangeHealthBar(newHealth));
+        if (_corutine != null)
+            StopCoroutine(_corutine);
+
+        _corutine = ChangeHealthBar(newHealth);
+        StartCoroutine(_corutine);
     }
 
     private IEnumerator ChangeHealthBar(float newHealth)
     {
         float maxHealth = 100f;
-        float currentValue = _slider.value;
         float endValue = newHealth / maxHealth;
 
-        while (currentValue != endValue)
+        while (_slider.value != endValue)
         {
-            float maxChanges = 0.001f;
-            currentValue = Mathf.MoveTowards(currentValue, endValue, maxChanges);
-            _slider.value = currentValue;
+            int speedDivider = 1000;
+            _slider.value = Mathf.MoveTowards(_slider.value, endValue, _changeSpeed / speedDivider);
 
             yield return null;
         }

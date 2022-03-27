@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(MaleAnimation))]
 
 public class Health : MonoBehaviour
 {
@@ -8,60 +8,38 @@ public class Health : MonoBehaviour
     [SerializeField] private float _changingValue;
 
     private float _maxHealth = 100f;
-    private bool _isAlive = true;
-
+    private float _minHealth = 0f;
+    private MaleAnimation _animation;
     private float _health;
-    private Animator _animator;
 
     private void Start()
     {
         _health = _maxHealth;
-        _animator = GetComponent<Animator>();
+        _animation = GetComponent<MaleAnimation>();
     }
 
-    public void Hit()
+    public void Damage()
     {
-        if (_isAlive)
-        {
-            float minHealth = 0f;
+        if (_health > 0)
+        {            
+            _health = Mathf.Clamp(_health - _changingValue, _minHealth, _maxHealth);
+            _healthBar.ChangeValue(_health);
+            _animation.Damage();
 
-            _animator.SetTrigger(AnimatorMale.Params.Hit);
-            _health = _health - _changingValue < minHealth ? minHealth : _health - _changingValue;
-            _healthBar.ShowNewHealth(_health);
-
-            if (_health == minHealth)
+            if (_health == _minHealth)
             {
-                _isAlive = false;
-                _animator.SetTrigger(AnimatorMale.Params.Die);
+                _animation.Die();
             }
         }
     }
 
-    public void Cure()
+    public void Heal()
     {
-        if (_isAlive)
+        if (_health > 0)
         {
-            _animator.SetTrigger(AnimatorMale.Params.Cure);
-            _health = _health + _changingValue > _maxHealth ? _maxHealth : _health + _changingValue;
-            _healthBar.ShowNewHealth(_health);
+            _health = Mathf.Clamp(_health + _changingValue, _minHealth, _maxHealth);
+            _healthBar.ChangeValue(_health);
+            _animation.Heal();
         }
-    }
-}
-
-public static class AnimatorMale
-{
-    public static class Params
-    {
-        public const string Hit = nameof(Hit);
-        public const string Cure = nameof(Cure);
-        public const string Die = nameof(Die);
-    }
-
-    public static class Male
-    {
-        public const string Idle = nameof(Idle);
-        public const string Hit = nameof(Hit);
-        public const string Cure = nameof(Cure);
-        public const string Death = nameof(Death);
     }
 }
