@@ -1,13 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.UI;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
 
 public class Health : MonoBehaviour
 {
-    [SerializeField] private Slider _slider;
+    [SerializeField] private HealthBar _healthBar;
     [SerializeField] private float _changingValue;
 
     private float _maxHealth = 100f;
@@ -26,12 +23,13 @@ public class Health : MonoBehaviour
     {
         if (_isAlive)
         {
-            _animator.SetTrigger(AnimatorMale.Params.Hit);
-            float endHealth = _health - _changingValue < 0 ? 0 : _health - _changingValue;
-            StartCoroutine(ChangeHealth(_health, endHealth));
-            _health = endHealth;
+            float minHealth = 0f;
 
-            if (_health == 0)
+            _animator.SetTrigger(AnimatorMale.Params.Hit);
+            _health = _health - _changingValue < minHealth ? minHealth : _health - _changingValue;
+            _healthBar.ShowNewHealth(_health);
+
+            if (_health == minHealth)
             {
                 _isAlive = false;
                 _animator.SetTrigger(AnimatorMale.Params.Die);
@@ -44,22 +42,8 @@ public class Health : MonoBehaviour
         if (_isAlive)
         {
             _animator.SetTrigger(AnimatorMale.Params.Cure);
-            float endHealth = _health + _changingValue > 100 ? 100 : _health + _changingValue;
-            StartCoroutine(ChangeHealth(_health, endHealth));
-            _health = endHealth;
-        }
-    }
-
-    private IEnumerator ChangeHealth(float startValue, float endValue)
-    {
-        float currentValue = startValue;
-
-        while (currentValue != endValue)
-        {
-            float minChanges = 0.1f;
-            currentValue = Mathf.MoveTowards(currentValue, endValue, minChanges);
-            _slider.value = currentValue / _maxHealth;
-            yield return null;
+            _health = _health + _changingValue > _maxHealth ? _maxHealth : _health + _changingValue;
+            _healthBar.ShowNewHealth(_health);
         }
     }
 }
