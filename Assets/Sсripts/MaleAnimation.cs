@@ -1,29 +1,33 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(Health))]
 
 public class MaleAnimation : MonoBehaviour
 {
     private Animator _animator;
+    private Health _health;
+    private float _currentHealth;
+    private float _minHealth;
+    private float _maxHealth;
 
     private void Start()
     {
+        _health = GetComponent<Health>();
         _animator = GetComponent<Animator>();
+        _maxHealth = _health.MaxHealth;
+        _minHealth = _health.MinHealth;
+        _currentHealth = _maxHealth;
     }
 
-    public void Heal()
+    public void Animate(float newHealth)
     {
-        _animator.SetTrigger(AnimatorMale.Params.Heal);
-    }
-
-    public void Damage()
-    {
-        _animator.SetTrigger(AnimatorMale.Params.Damage);
-    }
-
-    public void Die()
-    {
-        _animator.SetTrigger(AnimatorMale.Params.Die);
+        if (newHealth == _minHealth)
+            _animator.SetTrigger(AnimatorMale.Params.Die);
+        else if (newHealth > _currentHealth)
+            _animator.SetTrigger(AnimatorMale.Params.Heal);
+        else if (newHealth < _currentHealth)
+            _animator.SetTrigger(AnimatorMale.Params.Damage);
     }
 }
 

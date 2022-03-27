@@ -8,7 +8,7 @@ public class HealthBar : MonoBehaviour
 {
     [SerializeField] float _changeSpeed;
 
-    private IEnumerator _corutine;
+    private Coroutine _corutine;
     private Slider _slider;
 
     private void Start()
@@ -21,19 +21,17 @@ public class HealthBar : MonoBehaviour
         if (_corutine != null)
             StopCoroutine(_corutine);
 
-        _corutine = ChangeHealthBar(newHealth);
-        StartCoroutine(_corutine);
+        _corutine = StartCoroutine(Change(newHealth));
     }
 
-    private IEnumerator ChangeHealthBar(float newHealth)
+    private IEnumerator Change(float newHealth)
     {
         float maxHealth = 100f;
         float endValue = newHealth / maxHealth;
 
         while (_slider.value != endValue)
         {
-            int speedDivider = 1000;
-            _slider.value = Mathf.MoveTowards(_slider.value, endValue, _changeSpeed / speedDivider);
+            _slider.value = Mathf.MoveTowards(_slider.value, endValue, _changeSpeed);
 
             yield return null;
         }
