@@ -28,6 +28,8 @@ public class MaleAnimation : MonoBehaviour
             _animator.SetTrigger(AnimatorMale.Params.Heal);
         else if (newHealth < _currentHealth)
             _animator.SetTrigger(AnimatorMale.Params.Damage);
+
+        _currentHealth = newHealth;
     }
 }
 
